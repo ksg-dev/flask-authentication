@@ -71,7 +71,7 @@ def register():
             # Login and authenticate user after adding details to db
             login_user(new_user)
 
-            return render_template("secrets.html")
+            return render_template("secrets.html", logged_in=True)
     return render_template("register.html")
 
 
@@ -86,7 +86,7 @@ def login():
             if check_password_hash(user.password, password):
                 login_user(user)
 
-                return redirect(url_for('secrets'))
+                return redirect(url_for('secrets', logged_in=True))
 
             else:
                 flash("Email/Password combination incorrect")
@@ -101,7 +101,6 @@ def login():
 @app.route('/secrets')
 @login_required
 def secrets():
-    print(current_user.name)
     return render_template("secrets.html", name=current_user.name)
 
 
