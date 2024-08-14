@@ -50,20 +50,28 @@ def home():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        hashed_pw = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
-        new_user = User(
-            email=request.form.get("email"),
-            name=request.form.get("name"),
-            password=hashed_pw,
-        )
 
-        db.session.add(new_user)
-        db.session.commit()
+        entered_email = request.form.get("email")
+        user = db.session.execute(db.select(User).where(User.email == entered_email)).scalar()
+        if user:
+            flash("That email is already registered. Login instead")
+            return redirect(url_for("login"))
 
-        # Login and authenticate user after adding details to db
-        login_user(new_user)
+        else:
+            hashed_pw = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
+            new_user = User(
+                email=request.form.get("email"),
+                name=request.form.get("name"),
+                password=hashed_pw,
+            )
 
-        return render_template("secrets.html")
+            db.session.add(new_user)
+            db.session.commit()
+
+            # Login and authenticate user after adding details to db
+            login_user(new_user)
+
+            return render_template("secrets.html")
     return render_template("register.html")
 
 
@@ -81,8 +89,11 @@ def login():
                 return redirect(url_for('secrets'))
 
             else:
-                flash("User or password incorrect")
+                flash("Email/Password combination incorrect")
                 return redirect(url_for("login"))
+        else:
+            flash("We have no record of that email. Please try again")
+            return redirect(url_for("login"))
 
     return render_template("login.html")
 
