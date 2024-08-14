@@ -41,10 +41,11 @@ def home():
 @app.route('/register', methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+        hashed_pw = generate_password_hash(request.form.get("password"), method='pbkdf2:sha256', salt_length=8)
         new_user = User(
             email=request.form["email"],
             name=request.form["name"],
-            password=request.form["password"]
+            password=hashed_pw
         )
 
         db.session.add(new_user)
