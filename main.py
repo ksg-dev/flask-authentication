@@ -49,7 +49,7 @@ def register():
 
         db.session.add(new_user)
         db.session.commit()
-        return redirect(url_for("secrets"))
+        return render_template("secrets.html", name=new_user.name)
     return render_template("register.html")
 
 
